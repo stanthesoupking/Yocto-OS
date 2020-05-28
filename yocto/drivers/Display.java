@@ -6,8 +6,11 @@ import com.pi4j.io.spi.SpiFactory;
 import com.pi4j.io.spi.SpiMode;
 
 import yocto.logging.Logger;
+import yocto.util.IntegerPair;
+
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Display {
@@ -21,7 +24,7 @@ public class Display {
     protected char[] gdramBuffer;
     protected SpiDevice spi = null;
 
-    private Set<Integer> dirtyGDRamBytes;
+    private Set<IntegerPair> dirtyGDRamBytes;
 
     public Display() throws IOException {
         spi = SpiFactory.getInstance(SpiChannel.CS1, 540000, SpiMode.MODE_0);
@@ -29,15 +32,15 @@ public class Display {
         // Create GD RAM buffer
         gdramBuffer = new char[GDRAM_SIZE * 2];
 
-        // // Create GD RAM dirty bytes set
-        // dirtyGDRamBytes = new Set<Integer>();
+        // Create GD RAM dirty bytes set
+        dirtyGDRamBytes = new HashSet<IntegerPair>(GDRAM_SIZE);
 
         Logger.log(getClass(), "Setting up display...");
         setupDisplay(true, false, false);
         setGraphicDisplay(true);
 
         Logger.log(getClass(), "Clearing GD RAM...");
-        clearGDRam();
+        clear();
 
         Logger.log(getClass(), "Drawing test pixels...");
         for (int x = 0; x < SCREEN_WIDTH; x++) {
@@ -46,10 +49,14 @@ public class Display {
             }
         }
         Logger.log(getClass(), "Complete!");
+
+        Logger.log(getClass(), "Presenting...");
+        present();
+        Logger.log(getClass(), "Complete!");
     }
 
     private void writeData(byte[] data) throws IOException {
-        // Logger.log(getClass(), "Writing out " + data.length + " bytes...");
+        //Logger.log(getClass(), "Writing out " + data.length + " bytes...");
         // StringBuilder sb = new StringBuilder();
         // for (byte b : data) {
         // sb.append(String.format("%02X ", b));
@@ -82,13 +89,14 @@ public class Display {
     }
 
     private void sendInstructions(char[] instructions, boolean rs, boolean rw) throws IOException {
-        byte output[] = new byte[3 * instructions.length];
+        byte output[] = new byte[2 * instructions.length + 1];
 
         int outPos = 0;
-        for (int i = 0; i < instructions.length; i++) {
-            // Write synchronisation string
-            output[outPos++] = (byte) (0b11111000 | ((rs ? 1 : 0) << 1) | ((rw ? 1 : 0) << 2));
 
+        // Write synchronisation string
+        output[outPos++] = (byte) (0b11111000 | ((rs ? 1 : 0) << 1) | ((rw ? 1 : 0) << 2));
+        for (int i = 0; i < instructions.length; i++) {
+            
             // Write higher data (first 4 bits)
             output[outPos++] = (byte) (instructions[i] & 0b11110000);
 
@@ -152,8 +160,14 @@ public class Display {
     private void clearGDRam() throws IOException {
         char gbytes[] = { 0, 0 };
 
+        int pos;
         for (int y = 0; y < GDRAM_ROWS; y++) {
             for (int x = 0; x < GDRAM_COLS; x++) {
+                // Update GD Ram Buffer
+                pos = getGDRamBufferPosition(x, y);
+                gdramBuffer[pos] = 0;
+                gdramBuffer[pos + 1] = 0;
+
                 setGDRamBytes(x, y, gbytes);
             }
         }
@@ -183,13 +197,38 @@ public class Display {
 
         int bufferAddress = getGDRamBufferPosition(byte_x, byte_y);
         int offset = (x % 16) / 8;
+        char oldByte = gdramBuffer[bufferAddress + offset];
         if (state) {
             gdramBuffer[bufferAddress + offset] |= byte_mod;
         } else {
             gdramBuffer[bufferAddress + offset] &= ~byte_mod;
         }
 
-        char bytes[] = { gdramBuffer[bufferAddress], gdramBuffer[bufferAddress + 1] };
-        setGDRamBytes(byte_x, byte_y, bytes);
+        if (oldByte != gdramBuffer[bufferAddress + offset]) {
+            // Push dirty byte
+            dirtyGDRamBytes.add(new IntegerPair(byte_x, byte_y));
+        }
+
+        // char bytes[] = { gdramBuffer[bufferAddress], gdramBuffer[bufferAddress + 1] };
+        // setGDRamBytes(byte_x, byte_y, bytes);
+    }
+
+    public void clear() throws IOException {
+        clearGDRam();
+    }
+
+    public void present() throws IOException {
+        int addr;
+        char bytes[] = { 0, 0 };
+        Logger.log(getClass(), dirtyGDRamBytes.size() + " dirty bytes to update.");
+        for (IntegerPair dirtyPos : dirtyGDRamBytes) {
+            // Update dirty byte
+            addr = getGDRamBufferPosition(dirtyPos.a, dirtyPos.b);
+            bytes[0] = gdramBuffer[addr];
+            bytes[1] = gdramBuffer[addr + 1];
+
+            setGDRamBytes(dirtyPos.a, dirtyPos.b, bytes);
+        }
+        dirtyGDRamBytes.clear();
     }
 }
