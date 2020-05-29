@@ -7,6 +7,7 @@ import com.pi4j.io.spi.SpiMode;
 
 import yocto.logging.Logger;
 import yocto.util.IntegerPair;
+import yocto.util.bdf.Font;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -41,18 +42,7 @@ public class Display {
 
         Logger.log(getClass(), "Clearing GD RAM...");
         clear();
-
-        Logger.log(getClass(), "Drawing test pixels...");
-        for (int x = 0; x < SCREEN_WIDTH; x++) {
-            for (int y = 0; y < SCREEN_HEIGHT; y++) {
-                setPixel(x, y, true);
-            }
-        }
-        Logger.log(getClass(), "Complete!");
-
-        Logger.log(getClass(), "Presenting...");
         present();
-        Logger.log(getClass(), "Complete!");
     }
 
     private void writeData(byte[] data) throws IOException {
@@ -230,5 +220,31 @@ public class Display {
             setGDRamBytes(dirtyPos.a, dirtyPos.b, bytes);
         }
         dirtyGDRamBytes.clear();
+    }
+
+    public void writeChar(int x, int y, Font font, char c) throws IOException {
+        int charWidth = font.getFontWidth();
+        int charHeight = font.getFontHeight();
+
+        // Print character
+        char bmp[] = font.getBitmapData(c);
+        for (int sy = 0; sy < charHeight; sy++) {
+            for (int sx = 0; sx < charWidth; sx++) {
+                boolean draw = ((bmp[sy] << sx) & 128) == 128;
+                setPixel(x + sx, y + sy, draw);
+            }
+        }
+    }
+
+    public void writeString(int x, int y, Font font, String text) throws IOException {
+        int charWidth = font.getFontWidth();
+        int charHeight = font.getFontHeight();
+
+        int cx = x;
+        int totalChars = text.length();
+        for (int i = 0; i < totalChars; i++) {
+            writeChar(cx, y, font, text.charAt(i));
+            cx += charWidth;
+        }
     }
 }
