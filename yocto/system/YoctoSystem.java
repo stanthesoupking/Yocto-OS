@@ -30,11 +30,7 @@ class YoctoSystem {
         Font font = null;
         try {
             font = new Font("font.bdf");
-
-            Logger.log(YoctoSystem.class, "Writing text...");
-            display.writeString(0, 0, font, "Hello World!");
             display.present();
-            Logger.log(YoctoSystem.class, "Complete!");
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -43,5 +39,19 @@ class YoctoSystem {
             e.printStackTrace();
             System.exit(1);
         }
+
+        ApplicationContext applicationContext = new ApplicationContext(display, font);
+
+        // Start application server
+        ApplicationServer applicationServer = null;
+        try {
+            applicationServer = new ApplicationServer(applicationContext);
+            applicationServer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        
+        Logger.log(YoctoSystem.class, "System ready.");
     }
 }

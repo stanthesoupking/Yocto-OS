@@ -41,12 +41,13 @@ public class Display {
         setGraphicDisplay(true);
 
         Logger.log(getClass(), "Clearing GD RAM...");
+        clearGDRam();
         clear();
         present();
     }
 
     private void writeData(byte[] data) throws IOException {
-        //Logger.log(getClass(), "Writing out " + data.length + " bytes...");
+        // Logger.log(getClass(), "Writing out " + data.length + " bytes...");
         // StringBuilder sb = new StringBuilder();
         // for (byte b : data) {
         // sb.append(String.format("%02X ", b));
@@ -86,7 +87,7 @@ public class Display {
         // Write synchronisation string
         output[outPos++] = (byte) (0b11111000 | ((rs ? 1 : 0) << 1) | ((rw ? 1 : 0) << 2));
         for (int i = 0; i < instructions.length; i++) {
-            
+
             // Write higher data (first 4 bits)
             output[outPos++] = (byte) (instructions[i] & 0b11110000);
 
@@ -167,7 +168,7 @@ public class Display {
         return x * 2 + y * 8 * 4;
     }
 
-    private void setPixel(int x, int y, boolean state) throws IOException {
+    public void setPixel(int x, int y, boolean state) throws IOException {
         // Constrain X and Y
         if ((x < 0) || (x >= SCREEN_WIDTH) || (y < 0) || (y >= SCREEN_HEIGHT)) {
             return;
@@ -198,19 +199,21 @@ public class Display {
             // Push dirty byte
             dirtyGDRamBytes.add(new IntegerPair(byte_x, byte_y));
         }
-
-        // char bytes[] = { gdramBuffer[bufferAddress], gdramBuffer[bufferAddress + 1] };
-        // setGDRamBytes(byte_x, byte_y, bytes);
     }
 
     public void clear() throws IOException {
-        clearGDRam();
+        // TODO: Optimise this
+        for (int x = 0; x < SCREEN_WIDTH; x++) {
+            for (int y = 0; y < SCREEN_HEIGHT; y++) {
+                setPixel(x, y, false);
+            }
+        }
     }
 
     public void present() throws IOException {
         int addr;
         char bytes[] = { 0, 0 };
-        Logger.log(getClass(), dirtyGDRamBytes.size() + " dirty bytes to update.");
+        // Logger.log(getClass(), dirtyGDRamBytes.size() + " dirty bytes to update.");
         for (IntegerPair dirtyPos : dirtyGDRamBytes) {
             // Update dirty byte
             addr = getGDRamBufferPosition(dirtyPos.a, dirtyPos.b);
@@ -244,7 +247,7 @@ public class Display {
         int totalChars = text.length();
         for (int i = 0; i < totalChars; i++) {
             writeChar(cx, y, font, text.charAt(i));
-            cx += charWidth;
+            cx += charWidth + 1;
         }
     }
 }
