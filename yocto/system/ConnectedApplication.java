@@ -18,11 +18,15 @@ public class ConnectedApplication extends Thread {
     private boolean running;
     private ApplicationContext applicationContext;
 
+    // Is this application currently running in the foreground?
+    private boolean isForeground;
+
     ArrayList<ApplicationEvent> outputEventBuffer;
 
     public ConnectedApplication(ApplicationContext applicationContext, Socket socket) throws IOException {
         this.applicationContext = applicationContext;
         this.socket = socket;
+        this.isForeground = false;
 
         // Create input and output streams
         this.out = new ObjectOutputStream(this.socket.getOutputStream());
@@ -46,13 +50,12 @@ public class ConnectedApplication extends Thread {
                     // Logger.log(getClass(), "Received heartbeat from app.");
 
                     // Do events
-                    applicationContext.doEvent(new ApplicationEvent(ApplicationEventType.CLEAR));
-                    applicationContext.doEvents(response.events);
-                    applicationContext.doEvent(new ApplicationEvent(ApplicationEventType.PRESENT));
+                    applicationContext.doEvent(this, new ApplicationEvent(ApplicationEventType.CLEAR));
+                    applicationContext.doEvents(this, response.events);
+                    applicationContext.doEvent(this, new ApplicationEvent(ApplicationEventType.PRESENT));
                 } catch (ClassNotFoundException e) {
                     Logger.log(getClass(), "Error: received invalid response from client app.");
                 }
-
 
                 // Flush output events
                 ApplicationEvent events[] = outputEventBuffer.toArray(new ApplicationEvent[outputEventBuffer.size()]);
@@ -70,5 +73,13 @@ public class ConnectedApplication extends Thread {
         } catch (IOException e) {
             Logger.log(getClass(), "IO Error: " + e.getMessage());
         }
+    }
+    
+    public void setForeground(boolean v) {
+        isForeground = v;
+    }
+
+    public boolean getForeground() {
+        return isForeground;
     }
 }

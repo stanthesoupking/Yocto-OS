@@ -36,6 +36,7 @@ public class ApplicationServer extends Thread {
                 // Start new connection thread
                 ConnectedApplication app = new ConnectedApplication(applicationContext, socket);
                 app.start();
+                app.setForeground(true);
                 connectedApplications.add(app);
             }
         } catch (IOException e) {
