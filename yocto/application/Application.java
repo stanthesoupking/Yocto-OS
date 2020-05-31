@@ -2,11 +2,10 @@ package yocto.application;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 import yocto.logging.Logger;
-import yocto.util.ApplicationEvent;
-import yocto.util.ApplicationEventType;
+import yocto.event.ApplicationEvent;
+import yocto.event.ApplicationEventType;
 
 public class Application {
     private ApplicationServerConnection connection;
@@ -85,5 +84,9 @@ public class Application {
         event.sx = text;
 
         connection.pushEvent(event);
+    }
+
+    public ApplicationEvent[] getEvents() {
+        return connection.getEvents();
     }
 }

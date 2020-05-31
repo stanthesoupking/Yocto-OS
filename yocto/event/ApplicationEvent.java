@@ -1,4 +1,4 @@
-package yocto.util;
+package yocto.event;
 
 import java.io.Serializable;
 

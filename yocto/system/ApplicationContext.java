@@ -2,22 +2,28 @@ package yocto.system;
 
 import java.io.IOException;
 
-import yocto.drivers.Display;
-import yocto.util.ApplicationEvent;
-import yocto.util.ApplicationEventType;
+import yocto.driver.Display;
+import yocto.event.ApplicationEvent;
+import yocto.event.ApplicationEventType;
 import yocto.util.bdf.Font;
 
 public class ApplicationContext {
     private Display display;
+    private InputManager inputManager;
     private Font font;
 
-    public ApplicationContext(Display display, Font font) {
+    public ApplicationContext(Display display, Font font, InputManager inputManager) {
         this.display = display;
         this.font = font;
+        this.inputManager = inputManager;
     }
 
     public Display getDisplay() {
         return display;
+    }
+
+    public InputManager getInputManager() {
+        return inputManager;
     }
 
     public void doEvents(ConnectedApplication app, ApplicationEvent[] events) {

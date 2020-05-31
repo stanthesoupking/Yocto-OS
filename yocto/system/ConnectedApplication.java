@@ -7,8 +7,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import yocto.logging.Logger;
-import yocto.util.ApplicationEvent;
-import yocto.util.ApplicationEventType;
+import yocto.event.ApplicationEvent;
+import yocto.event.ApplicationEventType;
 import yocto.util.ApplicationHeartbeat;
 
 public class ConnectedApplication extends Thread {
@@ -60,8 +60,18 @@ public class ConnectedApplication extends Thread {
                 // Flush output events
                 ApplicationEvent events[] = outputEventBuffer.toArray(new ApplicationEvent[outputEventBuffer.size()]);
 
+                ApplicationEvent outEvents[] = new ApplicationEvent[0];
+
+                if (isForeground) {
+                    // Send input events
+                    outEvents = applicationContext.getInputManager().getKeyEvents();
+
+                    // Clear input manager events
+                    applicationContext.getInputManager().clearKeyEvents();
+                }
+
                 // Create heartbeat
-                ApplicationHeartbeat heartbeat = new ApplicationHeartbeat(events);
+                ApplicationHeartbeat heartbeat = new ApplicationHeartbeat(outEvents);
 
                 // Send heartbeat to app
                 // Logger.log(getClass(), "Sending heartbeat to app.");

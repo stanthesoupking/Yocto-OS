@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import yocto.logging.Logger;
 import yocto.system.ApplicationServer;
-import yocto.util.ApplicationEvent;
+import yocto.event.ApplicationEvent;
 import yocto.util.ApplicationHeartbeat;
 
 public class ApplicationServerConnection {
@@ -16,6 +16,7 @@ public class ApplicationServerConnection {
     private ObjectInputStream in;
     private ObjectOutputStream out;
 
+    ApplicationEvent[] inputEventBuffer;
     ArrayList<ApplicationEvent> outputEventBuffer;
 
     public ApplicationServerConnection() throws IOException {
@@ -25,6 +26,7 @@ public class ApplicationServerConnection {
         this.out = new ObjectOutputStream(this.socket.getOutputStream());
         this.in = new ObjectInputStream(this.socket.getInputStream());
 
+        inputEventBuffer = new ApplicationEvent[0];
         outputEventBuffer = new ArrayList<ApplicationEvent>();
     }
 
@@ -45,6 +47,7 @@ public class ApplicationServerConnection {
         ApplicationHeartbeat response = null;
         try {
             response = (ApplicationHeartbeat) in.readObject();
+            inputEventBuffer = response.events;
         } catch (ClassNotFoundException e) {
             Logger.log(getClass(), "Error: received invalid response from server.");
             return new ApplicationEvent[0];
@@ -56,5 +59,9 @@ public class ApplicationServerConnection {
 
     public void pushEvent(ApplicationEvent event) {
         outputEventBuffer.add(event);
-	}
+    }
+    
+    public ApplicationEvent[] getEvents() {
+        return inputEventBuffer;
+    }
 }

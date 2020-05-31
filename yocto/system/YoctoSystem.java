@@ -2,9 +2,8 @@ package yocto.system;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 
-import yocto.drivers.Display;
+import yocto.driver.Display;
 import yocto.logging.Logger;
 import yocto.util.bdf.Font;
 
@@ -41,12 +40,14 @@ class YoctoSystem {
         }
 
         // Start input manager
+        Logger.log(YoctoSystem.class, "Starting input manager...");
         InputManager inputManager = new InputManager();
         inputManager.start();
 
-        ApplicationContext applicationContext = new ApplicationContext(display, font);
+        ApplicationContext applicationContext = new ApplicationContext(display, font, inputManager);
 
         // Start application server
+        Logger.log(YoctoSystem.class, "Starting application server...");
         ApplicationServer applicationServer = null;
         try {
             applicationServer = new ApplicationServer(applicationContext);

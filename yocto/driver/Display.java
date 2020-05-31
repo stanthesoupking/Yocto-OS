@@ -1,4 +1,4 @@
-package yocto.drivers;
+package yocto.driver;
 
 import com.pi4j.io.spi.SpiChannel;
 import com.pi4j.io.spi.SpiDevice;

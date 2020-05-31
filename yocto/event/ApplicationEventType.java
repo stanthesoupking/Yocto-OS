@@ -1,4 +1,4 @@
-package yocto.util;
+package yocto.event;
 
 public enum ApplicationEventType {
     SET_PIXEL,
@@ -6,5 +6,6 @@ public enum ApplicationEventType {
     WRITE_CHAR,
     WRITE_STRING,
     CLEAR,
+    KEY,
     PRESENT
 };
