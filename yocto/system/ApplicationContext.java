@@ -5,6 +5,7 @@ import java.io.IOException;
 import yocto.driver.Display;
 import yocto.event.ApplicationEvent;
 import yocto.event.ApplicationEventType;
+import yocto.event.SetApplicationTitleEvent;
 import yocto.util.bdf.Font;
 
 public class ApplicationContext {
@@ -53,6 +54,9 @@ public class ApplicationContext {
                     break;
                 case PRESENT:
                     doPresent(event);
+                    break;
+                case SET_APP_TITLE:
+                    doSetApplicationTitle(app, event);
                     break;
                 default:
                     // Do nothing
@@ -121,6 +125,11 @@ public class ApplicationContext {
         }
     }
 
+    private void doSetApplicationTitle(ConnectedApplication app, ApplicationEvent event) {
+        SetApplicationTitleEvent setTitleEvent = (SetApplicationTitleEvent) event;
+        app.setApplicationTitle(setTitleEvent.getTitle());
+    }
+    
     private boolean isForegroundOnly(ApplicationEvent event) {
         return ((event.eventType == ApplicationEventType.CLEAR) || (event.eventType == ApplicationEventType.PRESENT)
                 || (event.eventType == ApplicationEventType.SET_PIXEL)

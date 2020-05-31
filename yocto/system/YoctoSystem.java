@@ -3,12 +3,15 @@ package yocto.system;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import yocto.application.ThreadedApplicationRunner;
+import yocto.core.app.DashboardApplication;
 import yocto.driver.Display;
 import yocto.logging.Logger;
 import yocto.util.bdf.Font;
 
-class YoctoSystem {
+public class YoctoSystem {
 
+    public static String YOCTO_VERSION = "0.1.0 ALPHA";
     private static Display display;
 
     public static void main(String args[]) {
@@ -56,6 +59,10 @@ class YoctoSystem {
             e.printStackTrace();
             System.exit(1);
         }
+
+        // Start dashboard app
+        ThreadedApplicationRunner dashboardApp = new ThreadedApplicationRunner(new DashboardApplication());
+        dashboardApp.start();
         
         Logger.log(YoctoSystem.class, "System ready.");
     }

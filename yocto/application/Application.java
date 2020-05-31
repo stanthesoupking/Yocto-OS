@@ -6,9 +6,16 @@ import java.lang.reflect.Constructor;
 import yocto.logging.Logger;
 import yocto.event.ApplicationEvent;
 import yocto.event.ApplicationEventType;
+import yocto.event.SetApplicationTitleEvent;
 
 public class Application {
+    // Connection to the Yocto application server
     private ApplicationServerConnection connection;
+
+    // Placeholder application title
+    //  - This should be changed by the extending app by running
+    //      setApplicationTitle(...)
+    private String applicationTitle = "Unknown Application";
 
     public Application() {
         // Connect to Yocto system
@@ -88,5 +95,12 @@ public class Application {
 
     public ApplicationEvent[] getEvents() {
         return connection.getEvents();
+    }
+
+    public void setApplicationTitle(String title) {
+        applicationTitle = title;
+
+        // Send update to app server
+        connection.pushEvent(new SetApplicationTitleEvent(applicationTitle));
     }
 }

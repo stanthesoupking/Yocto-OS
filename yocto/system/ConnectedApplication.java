@@ -16,14 +16,18 @@ public class ConnectedApplication extends Thread {
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private boolean running;
+    private ApplicationServer applicationServer;
     private ApplicationContext applicationContext;
 
     // Is this application currently running in the foreground?
     private boolean isForeground;
+    
+    private String applicationTitle = "Unknown Application";
 
     ArrayList<ApplicationEvent> outputEventBuffer;
 
-    public ConnectedApplication(ApplicationContext applicationContext, Socket socket) throws IOException {
+    public ConnectedApplication(ApplicationServer applicationServer, ApplicationContext applicationContext, Socket socket) throws IOException {
+        this.applicationServer = applicationServer;
         this.applicationContext = applicationContext;
         this.socket = socket;
         this.isForeground = false;
@@ -83,6 +87,9 @@ public class ConnectedApplication extends Thread {
         } catch (IOException e) {
             Logger.log(getClass(), "IO Error: " + e.getMessage());
         }
+
+        // Close application
+        closeApplication();
     }
     
     public void setForeground(boolean v) {
@@ -91,5 +98,17 @@ public class ConnectedApplication extends Thread {
 
     public boolean getForeground() {
         return isForeground;
+    }
+
+    public void setApplicationTitle(String title) {
+        applicationTitle = title;
+    }
+
+    public String getApplicationTitle() {
+        return applicationTitle;
+    }
+
+    public void closeApplication() {
+        applicationServer.removeApplication(this);
     }
 }
