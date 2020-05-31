@@ -1,23 +1,42 @@
 package yocto.application;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import yocto.logging.Logger;
 import yocto.util.ApplicationEvent;
 import yocto.util.ApplicationEventType;
 
 public class Application {
-    private static ApplicationServerConnection connection;
+    private ApplicationServerConnection connection;
 
-    public static void init() {
+    public Application() {
         // Connect to Yocto system
         connectToSystem();
     }
 
     /**
+     * Starts the application
+     * 
+     * @param appClass class of the application to start
+     * @param args
+     */
+    public static void launch(Class<? extends Application> appClass, String... args) {
+        try {
+            Constructor<?> ctor = appClass.getConstructor();
+            Application app = (Application) ctor.newInstance();
+            app.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    /**
      * Connect to the yocto system
      */
-    private static void connectToSystem() {
+    private void connectToSystem() {
         try {
             connection = new ApplicationServerConnection();
         } catch (IOException e) {
@@ -26,13 +45,22 @@ public class Application {
     }
 
     /**
+     * Application entry method.
+     * 
+     * Called on application startup.
+     */
+    public void start() {
+        // Override this.
+    }
+
+    /**
      * Push and pull events with the Yocto system
      */
-    public static ApplicationEvent[] sync() throws IOException {
+    public ApplicationEvent[] sync() throws IOException {
         return connection.sync();
     }
 
-    public static void setPixel(int x, int y, boolean state) {
+    public void setPixel(int x, int y, boolean state) {
         ApplicationEvent event = new ApplicationEvent();
         event.eventType = state ? ApplicationEventType.SET_PIXEL : ApplicationEventType.UNSET_PIXEL;
         event.ix = x;
@@ -41,7 +69,7 @@ public class Application {
         connection.pushEvent(event);
     }
 
-    public static void writeChar(int x, int y, char c) {
+    public void writeChar(int x, int y, char c) {
         ApplicationEvent event = new ApplicationEvent(ApplicationEventType.WRITE_CHAR);
         event.ix = x;
         event.iy = y;
@@ -50,7 +78,7 @@ public class Application {
         connection.pushEvent(event);
     }
 
-    public static void writeString(int x, int y, String text) {
+    public void writeString(int x, int y, String text) {
         ApplicationEvent event = new ApplicationEvent(ApplicationEventType.WRITE_STRING);
         event.ix = x;
         event.iy = y;
