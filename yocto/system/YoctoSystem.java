@@ -40,6 +40,10 @@ class YoctoSystem {
             System.exit(1);
         }
 
+        // Start input manager
+        InputManager inputManager = new InputManager();
+        inputManager.start();
+
         ApplicationContext applicationContext = new ApplicationContext(display, font);
 
         // Start application server
