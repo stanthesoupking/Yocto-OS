@@ -58,6 +58,7 @@ public class InputManager extends Thread {
     
     private void generateKeyEvent(KeyStroke key) {
         KeyEvent keyEvent = null;
+        Logger.log(getClass(), "Key pressed " + key);
         if(key.getKeyType() == KeyType.Character) {
             keyEvent = KeyEvent.createCharacterEvent(key.getCharacter());
         } else if (key.getKeyType() == KeyType.ArrowDown) {

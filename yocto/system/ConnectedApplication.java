@@ -12,6 +12,9 @@ import yocto.event.ApplicationEventType;
 import yocto.util.ApplicationHeartbeat;
 
 public class ConnectedApplication extends Thread {
+    // The rate at which the application thread will check if it is foregrounded (when sleeping)
+    private static int FOREGROUND_POLLING_RATE = 100;
+
     private Socket socket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
@@ -20,13 +23,16 @@ public class ConnectedApplication extends Thread {
     private ApplicationContext applicationContext;
 
     // Is this application currently running in the foreground?
-    private boolean isForeground;
-    
+    private Boolean isForeground;
+
     private String applicationTitle = "Unknown Application";
+
+    private boolean applicationRunInBackground = false;
 
     ArrayList<ApplicationEvent> outputEventBuffer;
 
-    public ConnectedApplication(ApplicationServer applicationServer, ApplicationContext applicationContext, Socket socket) throws IOException {
+    public ConnectedApplication(ApplicationServer applicationServer, ApplicationContext applicationContext,
+            Socket socket) throws IOException {
         this.applicationServer = applicationServer;
         this.applicationContext = applicationContext;
         this.socket = socket;
@@ -72,6 +78,11 @@ public class ConnectedApplication extends Thread {
 
                     // Clear input manager events
                     applicationContext.getInputManager().clearKeyEvents();
+                } else if (!applicationRunInBackground) {
+                    // Sleep until application is in foreground
+                    while (!isForeground) {
+                        Thread.sleep(FOREGROUND_POLLING_RATE);
+                    }
                 }
 
                 // Create heartbeat
@@ -86,6 +97,8 @@ public class ConnectedApplication extends Thread {
             }
         } catch (IOException e) {
             Logger.log(getClass(), "IO Error: " + e.getMessage());
+        } catch (InterruptedException e) {
+            Logger.log(getClass(), "Interrupted Error: " + e.getMessage());
         }
 
         // Close application
@@ -106,6 +119,10 @@ public class ConnectedApplication extends Thread {
 
     public String getApplicationTitle() {
         return applicationTitle;
+    }
+
+    public void setApplicationRunInBackground(boolean value) {
+        applicationRunInBackground = value;
     }
 
     public void closeApplication() {

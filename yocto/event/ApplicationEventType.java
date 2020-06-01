@@ -6,6 +6,7 @@ public enum ApplicationEventType {
     WRITE_CHAR,
     WRITE_STRING,
     SET_APP_TITLE,
+    SET_APP_RUN_IN_BACKGROUND,
     CLEAR,
     KEY,
     PRESENT

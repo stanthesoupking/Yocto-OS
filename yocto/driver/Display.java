@@ -80,6 +80,28 @@ public class Display {
     }
 
     private void sendInstructions(char[] instructions, boolean rs, boolean rw) throws IOException {
+        byte output[] = new byte[3 * instructions.length];
+
+        int outPos = 0;
+        for (int i = 0; i < instructions.length; i++) {
+            // Write synchronisation string
+            output[outPos++] = (byte) (0b11111000 | ((rs ? 1 : 0) << 1) | ((rw ? 1 : 0) << 2));
+            
+            // Write higher data (first 4 bits)
+            output[outPos++] = (byte) (instructions[i] & 0b11110000);
+
+            // Write lower data
+            output[outPos++] = (byte) (instructions[i] << 4);
+        }
+
+        writeData(output);
+    }
+
+    private void sendInstructionsUnsafe(char[] instructions) throws IOException {
+        sendInstructionsUnsafe(instructions, false, false);
+    }
+
+    private void sendInstructionsUnsafe(char[] instructions, boolean rs, boolean rw) throws IOException {
         byte output[] = new byte[2 * instructions.length + 1];
 
         int outPos = 0;

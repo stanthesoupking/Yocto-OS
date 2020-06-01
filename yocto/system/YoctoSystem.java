@@ -61,7 +61,7 @@ public class YoctoSystem {
         }
 
         // Start dashboard app
-        ThreadedApplicationRunner dashboardApp = new ThreadedApplicationRunner(new DashboardApplication());
+        ThreadedApplicationRunner dashboardApp = new ThreadedApplicationRunner(new DashboardApplication(applicationServer));
         dashboardApp.start();
         
         Logger.log(YoctoSystem.class, "System ready.");

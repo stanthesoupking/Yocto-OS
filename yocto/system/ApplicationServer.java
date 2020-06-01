@@ -40,9 +40,9 @@ public class ApplicationServer extends Thread {
                 app.start();
                 connectedApplications.add(app);
 
-                //if (foregroundApplication == null) {
+                if (foregroundApplication == null) {
                     setForegroundApplication(app);
-                //}
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

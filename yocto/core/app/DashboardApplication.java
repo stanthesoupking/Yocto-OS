@@ -4,9 +4,17 @@ import java.io.IOException;
 import java.util.Calendar;
 
 import yocto.application.Application;
+import yocto.system.ApplicationServer;
 import yocto.system.YoctoSystem;
 
 public class DashboardApplication extends Application {
+    private ApplicationServer applicationServer;
+
+    public DashboardApplication(ApplicationServer applicationServer) {
+        super();
+        this.applicationServer = applicationServer;
+    }
+
     @Override
     public void start() {
         setApplicationTitle("Dashboard");
@@ -16,6 +24,7 @@ public class DashboardApplication extends Application {
             writeString(83, 1, getTime());
             writeString(1, 58, "Yocto OS v" + YoctoSystem.YOCTO_VERSION);
 
+            writeString(1, 9, "Total running apps: " + applicationServer.getApplicationCount());
             try {
                 sync();
             } catch (IOException e) {

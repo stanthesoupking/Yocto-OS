@@ -5,7 +5,9 @@ import java.io.IOException;
 import yocto.driver.Display;
 import yocto.event.ApplicationEvent;
 import yocto.event.ApplicationEventType;
+import yocto.event.SetApplicationRunInBackgroundEvent;
 import yocto.event.SetApplicationTitleEvent;
+import yocto.event.WriteStringEvent;
 import yocto.util.bdf.Font;
 
 public class ApplicationContext {
@@ -57,6 +59,9 @@ public class ApplicationContext {
                     break;
                 case SET_APP_TITLE:
                     doSetApplicationTitle(app, event);
+                    break;
+                case SET_APP_RUN_IN_BACKGROUND:
+                    doSetApplicationRunInBackground(app, event);
                     break;
                 default:
                     // Do nothing
@@ -117,8 +122,9 @@ public class ApplicationContext {
 
     private void doWriteString(ApplicationEvent event) {
         try {
+            WriteStringEvent writeStringEvent = (WriteStringEvent) event;
             synchronized (display) {
-                display.writeString(event.ix, event.iy, font, event.sx);
+                display.writeString(writeStringEvent.x, writeStringEvent.y, font, writeStringEvent.text);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -129,7 +135,12 @@ public class ApplicationContext {
         SetApplicationTitleEvent setTitleEvent = (SetApplicationTitleEvent) event;
         app.setApplicationTitle(setTitleEvent.getTitle());
     }
-    
+
+    private void doSetApplicationRunInBackground(ConnectedApplication app, ApplicationEvent event) {
+        SetApplicationRunInBackgroundEvent setEvent = (SetApplicationRunInBackgroundEvent) event;
+        app.setApplicationRunInBackground(setEvent.value);
+    }
+
     private boolean isForegroundOnly(ApplicationEvent event) {
         return ((event.eventType == ApplicationEventType.CLEAR) || (event.eventType == ApplicationEventType.PRESENT)
                 || (event.eventType == ApplicationEventType.SET_PIXEL)

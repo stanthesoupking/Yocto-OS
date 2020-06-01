@@ -6,7 +6,9 @@ import java.lang.reflect.Constructor;
 import yocto.logging.Logger;
 import yocto.event.ApplicationEvent;
 import yocto.event.ApplicationEventType;
+import yocto.event.SetApplicationRunInBackgroundEvent;
 import yocto.event.SetApplicationTitleEvent;
+import yocto.event.WriteStringEvent;
 
 public class Application {
     // Connection to the Yocto application server
@@ -16,6 +18,11 @@ public class Application {
     //  - This should be changed by the extending app by running
     //      setApplicationTitle(...)
     private String applicationTitle = "Unknown Application";
+
+    // Should the application continue to run while in the background?
+    //  - If set to false, the app will freeze when it is no longer in the foreground
+    //  - This prevents the sync from progressing while the app is backgrounded.
+    private boolean runInBackground = false;
 
     public Application() {
         // Connect to Yocto system
@@ -85,11 +92,7 @@ public class Application {
     }
 
     public void writeString(int x, int y, String text) {
-        ApplicationEvent event = new ApplicationEvent(ApplicationEventType.WRITE_STRING);
-        event.ix = x;
-        event.iy = y;
-        event.sx = text;
-
+        WriteStringEvent event = new WriteStringEvent(x, y, text);
         connection.pushEvent(event);
     }
 
@@ -102,5 +105,12 @@ public class Application {
 
         // Send update to app server
         connection.pushEvent(new SetApplicationTitleEvent(applicationTitle));
+    }
+
+    public void setRunInBackground(boolean v) {
+        runInBackground = v;
+
+        // Send update to app server
+        connection.pushEvent(new SetApplicationRunInBackgroundEvent(runInBackground));
     }
 }
