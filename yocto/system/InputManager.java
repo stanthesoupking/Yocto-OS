@@ -16,10 +16,10 @@ import yocto.event.KeyEventType;
 public class InputManager extends Thread {
     UnixTerminal terminal;
 
-    private ArrayList<KeyEvent> keyEvents;
+    private ApplicationServer applicationServer;
 
-    public InputManager() {
-        keyEvents = new ArrayList<KeyEvent>();
+    public InputManager(ApplicationServer applicationServer) {
+        this.applicationServer = applicationServer;
 
         // Connect to terminal
         terminal = null;
@@ -43,18 +43,6 @@ public class InputManager extends Thread {
             Logger.log(getClass(), "IO Error: " + e.getMessage());
         }
     }
-
-    public KeyEvent[] getKeyEvents() {
-        synchronized (keyEvents) {
-            return keyEvents.toArray(new KeyEvent[keyEvents.size()]);
-        }
-    }
-    
-    public void clearKeyEvents() {
-        synchronized (keyEvents) {
-            keyEvents.clear();
-        }
-    }
     
     private void generateKeyEvent(KeyStroke key) {
         KeyEvent keyEvent = null;
@@ -72,9 +60,8 @@ public class InputManager extends Thread {
         }
 
         if (keyEvent != null) {
-            synchronized(keyEvents) {
-                keyEvents.add(keyEvent);
-            }
+            // Push key event to application server
+            applicationServer.pushKeyEvent(keyEvent);
         }
     }
 }

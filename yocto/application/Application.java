@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import yocto.logging.Logger;
 import yocto.event.ApplicationEvent;
 import yocto.event.ApplicationEventType;
+import yocto.event.SetApplicationReceiveKeystrokesInBackgroundEvent;
 import yocto.event.SetApplicationRunInBackgroundEvent;
 import yocto.event.SetApplicationTitleEvent;
 import yocto.event.WriteStringEvent;
@@ -23,6 +24,11 @@ public class Application {
     //  - If set to false, the app will freeze when it is no longer in the foreground
     //  - This prevents the sync from progressing while the app is backgrounded.
     private boolean runInBackground = false;
+
+    // Does this application recieve keystrokes while it is running in the background?
+    //  - Note: The application can only act on these keystrokes in realtime if it is also set
+    //     to run in background.
+    private boolean applicationRecieveKeystrokesInBackground = false;
 
     public Application() {
         // Connect to Yocto system
@@ -112,5 +118,13 @@ public class Application {
 
         // Send update to app server
         connection.pushEvent(new SetApplicationRunInBackgroundEvent(runInBackground));
+    }
+
+
+    public void setReceiveKeystrokesInBackground(boolean v) {
+        applicationRecieveKeystrokesInBackground = v;
+
+        // Send update to app server
+        connection.pushEvent(new SetApplicationReceiveKeystrokesInBackgroundEvent(applicationRecieveKeystrokesInBackground));
     }
 }

@@ -42,12 +42,7 @@ public class YoctoSystem {
             System.exit(1);
         }
 
-        // Start input manager
-        Logger.log(YoctoSystem.class, "Starting input manager...");
-        InputManager inputManager = new InputManager();
-        inputManager.start();
-
-        ApplicationContext applicationContext = new ApplicationContext(display, font, inputManager);
+        ApplicationContext applicationContext = new ApplicationContext(display, font);
 
         // Start application server
         Logger.log(YoctoSystem.class, "Starting application server...");
@@ -59,6 +54,11 @@ public class YoctoSystem {
             e.printStackTrace();
             System.exit(1);
         }
+
+        // Start input manager
+        Logger.log(YoctoSystem.class, "Starting input manager...");
+        InputManager inputManager = new InputManager(applicationServer);
+        inputManager.start();
 
         // Start dashboard app
         ThreadedApplicationRunner dashboardApp = new ThreadedApplicationRunner(new DashboardApplication(applicationServer));

@@ -7,6 +7,7 @@ public enum ApplicationEventType {
     WRITE_STRING,
     SET_APP_TITLE,
     SET_APP_RUN_IN_BACKGROUND,
+    SET_APP_RECEIVE_KEYSTROKES_IN_BACKGROUND,
     CLEAR,
     KEY,
     PRESENT

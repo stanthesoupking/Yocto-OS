@@ -9,10 +9,12 @@ import java.util.ArrayList;
 import yocto.logging.Logger;
 import yocto.event.ApplicationEvent;
 import yocto.event.ApplicationEventType;
+import yocto.event.KeyEvent;
 import yocto.util.ApplicationHeartbeat;
 
 public class ConnectedApplication extends Thread {
-    // The rate at which the application thread will check if it is foregrounded (when sleeping)
+    // The rate at which the application thread will check if it is foregrounded
+    // (when sleeping)
     private static int FOREGROUND_POLLING_RATE = 100;
 
     private Socket socket;
@@ -26,8 +28,8 @@ public class ConnectedApplication extends Thread {
     private Boolean isForeground;
 
     private String applicationTitle = "Unknown Application";
-
     private boolean applicationRunInBackground = false;
+    private boolean applicationRecieveKeystrokesInBackground = false;
 
     ArrayList<ApplicationEvent> outputEventBuffer;
 
@@ -70,23 +72,13 @@ public class ConnectedApplication extends Thread {
                 // Flush output events
                 ApplicationEvent events[] = outputEventBuffer.toArray(new ApplicationEvent[outputEventBuffer.size()]);
 
-                ApplicationEvent outEvents[] = new ApplicationEvent[0];
-
-                if (isForeground) {
-                    // Send input events
-                    outEvents = applicationContext.getInputManager().getKeyEvents();
-
-                    // Clear input manager events
-                    applicationContext.getInputManager().clearKeyEvents();
-                } else if (!applicationRunInBackground) {
-                    // Sleep until application is in foreground
-                    while (!isForeground) {
-                        Thread.sleep(FOREGROUND_POLLING_RATE);
-                    }
+                // Sleep until application is in foreground
+                while (!(isForeground || applicationRunInBackground)) {
+                    Thread.sleep(FOREGROUND_POLLING_RATE);
                 }
 
                 // Create heartbeat
-                ApplicationHeartbeat heartbeat = new ApplicationHeartbeat(outEvents);
+                ApplicationHeartbeat heartbeat = new ApplicationHeartbeat(events);
 
                 // Send heartbeat to app
                 // Logger.log(getClass(), "Sending heartbeat to app.");
@@ -104,7 +96,7 @@ public class ConnectedApplication extends Thread {
         // Close application
         closeApplication();
     }
-    
+
     public void setForeground(boolean v) {
         isForeground = v;
     }
@@ -123,6 +115,19 @@ public class ConnectedApplication extends Thread {
 
     public void setApplicationRunInBackground(boolean value) {
         applicationRunInBackground = value;
+    }
+
+    public void setApplicationRecieveKeystrokesInBackground(boolean value) {
+        applicationRecieveKeystrokesInBackground = value;
+    }
+
+    public void pushKeyEvent(KeyEvent event) {
+        // Only push event if application is in foreground or is receiving keystrokes in background
+        if (isForeground || applicationRecieveKeystrokesInBackground) {
+            synchronized(outputEventBuffer) {
+                outputEventBuffer.add(event);
+            }
+        }
     }
 
     public void closeApplication() {

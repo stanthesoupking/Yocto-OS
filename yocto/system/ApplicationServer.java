@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import yocto.event.KeyEvent;
 import yocto.logging.Logger;
 
 public class ApplicationServer extends Thread {
@@ -85,5 +86,16 @@ public class ApplicationServer extends Thread {
 
     public ConnectedApplication getForegroundApplication() {
         return foregroundApplication;
+    }
+
+    /**
+     * Push key event to all connected applications.
+     */
+    public void pushKeyEvent(KeyEvent keyEvent) {
+        synchronized (connectedApplications) {
+            for (ConnectedApplication connectedApplication : connectedApplications) {
+                connectedApplication.pushKeyEvent(keyEvent);
+            }
+        }
     }
 }

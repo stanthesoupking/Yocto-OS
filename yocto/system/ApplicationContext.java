@@ -5,6 +5,7 @@ import java.io.IOException;
 import yocto.driver.Display;
 import yocto.event.ApplicationEvent;
 import yocto.event.ApplicationEventType;
+import yocto.event.SetApplicationReceiveKeystrokesInBackgroundEvent;
 import yocto.event.SetApplicationRunInBackgroundEvent;
 import yocto.event.SetApplicationTitleEvent;
 import yocto.event.WriteStringEvent;
@@ -12,21 +13,15 @@ import yocto.util.bdf.Font;
 
 public class ApplicationContext {
     private Display display;
-    private InputManager inputManager;
     private Font font;
 
-    public ApplicationContext(Display display, Font font, InputManager inputManager) {
+    public ApplicationContext(Display display, Font font) {
         this.display = display;
         this.font = font;
-        this.inputManager = inputManager;
     }
 
     public Display getDisplay() {
         return display;
-    }
-
-    public InputManager getInputManager() {
-        return inputManager;
     }
 
     public void doEvents(ConnectedApplication app, ApplicationEvent[] events) {
@@ -62,6 +57,9 @@ public class ApplicationContext {
                     break;
                 case SET_APP_RUN_IN_BACKGROUND:
                     doSetApplicationRunInBackground(app, event);
+                    break;
+                case SET_APP_RECEIVE_KEYSTROKES_IN_BACKGROUND:
+                    doSetApplicationReceiveKeystrokesInBackground(app, event);
                     break;
                 default:
                     // Do nothing
@@ -139,6 +137,11 @@ public class ApplicationContext {
     private void doSetApplicationRunInBackground(ConnectedApplication app, ApplicationEvent event) {
         SetApplicationRunInBackgroundEvent setEvent = (SetApplicationRunInBackgroundEvent) event;
         app.setApplicationRunInBackground(setEvent.value);
+    }
+
+    private void doSetApplicationReceiveKeystrokesInBackground(ConnectedApplication app, ApplicationEvent event) {
+        SetApplicationReceiveKeystrokesInBackgroundEvent setEvent = (SetApplicationReceiveKeystrokesInBackgroundEvent) event;
+        app.setApplicationRecieveKeystrokesInBackground(setEvent.value);
     }
 
     private boolean isForegroundOnly(ApplicationEvent event) {
