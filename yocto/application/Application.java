@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 
 import yocto.logging.Logger;
+import yocto.util.Bitmap;
 import yocto.event.ApplicationEvent;
 import yocto.event.ApplicationEventType;
+import yocto.event.DrawBitmapEvent;
 import yocto.event.SetApplicationReceiveKeystrokesInBackgroundEvent;
 import yocto.event.SetApplicationRunInBackgroundEvent;
 import yocto.event.SetApplicationTitleEvent;
@@ -99,6 +101,11 @@ public class Application {
 
     public void writeString(int x, int y, String text) {
         WriteStringEvent event = new WriteStringEvent(x, y, text);
+        connection.pushEvent(event);
+    }
+
+    public void drawBitmap(int x, int y, Bitmap bitmap) {
+        DrawBitmapEvent event = new DrawBitmapEvent(x, y, bitmap);
         connection.pushEvent(event);
     }
 

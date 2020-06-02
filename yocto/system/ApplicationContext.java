@@ -5,6 +5,7 @@ import java.io.IOException;
 import yocto.driver.Display;
 import yocto.event.ApplicationEvent;
 import yocto.event.ApplicationEventType;
+import yocto.event.DrawBitmapEvent;
 import yocto.event.SetApplicationReceiveKeystrokesInBackgroundEvent;
 import yocto.event.SetApplicationRunInBackgroundEvent;
 import yocto.event.SetApplicationTitleEvent;
@@ -45,6 +46,9 @@ public class ApplicationContext {
                     break;
                 case WRITE_STRING:
                     doWriteString(event);
+                    break;
+                case DRAW_BITMAP:
+                    doDrawBitmap(event);
                     break;
                 case CLEAR:
                     doClear(event);
@@ -123,6 +127,17 @@ public class ApplicationContext {
             WriteStringEvent writeStringEvent = (WriteStringEvent) event;
             synchronized (display) {
                 display.writeString(writeStringEvent.x, writeStringEvent.y, font, writeStringEvent.text);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void doDrawBitmap(ApplicationEvent event) {
+        try {
+            DrawBitmapEvent drawBitmapEvent = (DrawBitmapEvent) event;
+            synchronized (display) {
+                display.drawBitmap(drawBitmapEvent.x, drawBitmapEvent.y, drawBitmapEvent.bitmap);
             }
         } catch (IOException e) {
             e.printStackTrace();

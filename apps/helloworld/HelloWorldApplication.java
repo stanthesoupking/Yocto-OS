@@ -9,6 +9,7 @@ import yocto.event.ApplicationEvent;
 import yocto.event.ApplicationEventType;
 import yocto.event.KeyEvent;
 import yocto.event.KeyEventType;
+import yocto.util.Bitmap;
 
 public class HelloWorldApplication extends Application {
 
@@ -27,10 +28,6 @@ public class HelloWorldApplication extends Application {
             String timeText = String.format("%02d:%02d:%02d %s", c.get(Calendar.HOUR), c.get(Calendar.MINUTE),
                     c.get(Calendar.SECOND), amPm);
             writeString(posX, 0, timeText);
-
-            for (int x = 0; x < 128; x++) {
-                setPixel(x, 6, true);
-            }
 
             try {
                 sync();

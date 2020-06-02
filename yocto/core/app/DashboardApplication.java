@@ -5,7 +5,9 @@ import java.util.Calendar;
 
 import yocto.application.Application;
 import yocto.system.ApplicationServer;
+import yocto.system.ConnectedApplication;
 import yocto.system.YoctoSystem;
+import yocto.util.Bitmap;
 
 public class DashboardApplication extends Application {
     private ApplicationServer applicationServer;
@@ -18,6 +20,16 @@ public class DashboardApplication extends Application {
     @Override
     public void start() {
         setApplicationTitle("Dashboard");
+        setRunInBackground(true);
+        setReceiveKeystrokesInBackground(true);
+
+        Bitmap logoBmp = null;
+        try {
+            logoBmp = Bitmap.loadFromFile("resources/img/logo.bmp");
+        } catch (IOException e) {
+            System.out.println("Error: Failed loading bitmap.");
+            System.exit(1);
+        }
 
         while (true) {
             writeString(1, 1, "Dashboard");
@@ -25,6 +37,10 @@ public class DashboardApplication extends Application {
             writeString(1, 58, "Yocto OS v" + YoctoSystem.YOCTO_VERSION);
 
             writeString(1, 9, "Total running apps: " + applicationServer.getApplicationCount());
+
+            // Draw bitmap
+            drawBitmap(16, 18, logoBmp);
+
             try {
                 sync();
             } catch (IOException e) {
@@ -37,8 +53,8 @@ public class DashboardApplication extends Application {
     public String getTime() {
         Calendar c = Calendar.getInstance();
         String amPm = c.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM";
-        return String.format("%02d:%02d:%02d %s", c.get(Calendar.HOUR), c.get(Calendar.MINUTE),
-                c.get(Calendar.SECOND), amPm);
+        return String.format("%02d:%02d:%02d %s", c.get(Calendar.HOUR), c.get(Calendar.MINUTE), c.get(Calendar.SECOND),
+                amPm);
     }
 
     public static void main(String args[]) {

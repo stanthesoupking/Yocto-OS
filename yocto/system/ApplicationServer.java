@@ -58,6 +58,10 @@ public class ApplicationServer extends Thread {
         return connectedApplications.get(index);
     }
 
+    public ConnectedApplication[] getApplications() {
+        return connectedApplications.toArray(new ConnectedApplication[connectedApplications.size()]);
+    }
+
     public void setForegroundApplication(int index) {
         setForegroundApplication(connectedApplications.get(index));
     }

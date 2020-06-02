@@ -6,6 +6,7 @@ import com.pi4j.io.spi.SpiFactory;
 import com.pi4j.io.spi.SpiMode;
 
 import yocto.logging.Logger;
+import yocto.util.Bitmap;
 import yocto.util.IntegerPair;
 import yocto.util.bdf.Font;
 
@@ -86,7 +87,7 @@ public class Display {
         for (int i = 0; i < instructions.length; i++) {
             // Write synchronisation string
             output[outPos++] = (byte) (0b11111000 | ((rs ? 1 : 0) << 1) | ((rw ? 1 : 0) << 2));
-            
+
             // Write higher data (first 4 bits)
             output[outPos++] = (byte) (instructions[i] & 0b11110000);
 
@@ -263,13 +264,23 @@ public class Display {
 
     public void writeString(int x, int y, Font font, String text) throws IOException {
         int charWidth = font.getFontWidth();
-        int charHeight = font.getFontHeight();
 
         int cx = x;
         int totalChars = text.length();
         for (int i = 0; i < totalChars; i++) {
             writeChar(cx, y, font, text.charAt(i));
             cx += charWidth + 1;
+        }
+    }
+
+    public void drawBitmap(int x, int y, Bitmap bitmap) throws IOException {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        for (int bx = 0; bx < width; bx++) {
+            for (int by = 0; by < height; by++) {
+                setPixel(x + bx, y + by, bitmap.getPixel(bx, by));
+            }
         }
     }
 }
