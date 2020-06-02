@@ -57,6 +57,10 @@ public class InputManager extends Thread {
             keyEvent = KeyEvent.createKeyEvent(KeyEventType.ArrowLeft);
         } else if (key.getKeyType() == KeyType.ArrowRight) {
             keyEvent = KeyEvent.createKeyEvent(KeyEventType.ArrowRight);
+        } else if (key.getKeyType() == KeyType.Enter) {
+            keyEvent = KeyEvent.createKeyEvent(KeyEventType.Enter);
+        } else if (key.getKeyType() == KeyType.Escape) {
+            keyEvent = KeyEvent.createKeyEvent(KeyEventType.Escape);
         }
 
         if (keyEvent != null) {

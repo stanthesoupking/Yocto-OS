@@ -5,5 +5,7 @@ public enum KeyEventType {
     ArrowLeft,
     ArrowRight,
     ArrowUp,
-    ArrowDown
+    ArrowDown,
+    Enter,
+    Escape
 }

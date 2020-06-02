@@ -2,6 +2,7 @@ package yocto.application;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.util.Calendar;
 
 import yocto.logging.Logger;
 import yocto.util.Bitmap;
@@ -22,18 +23,20 @@ public class Application {
     private ApplicationServerConnection connection;
 
     // Placeholder application title
-    //  - This should be changed by the extending app by running
-    //      setApplicationTitle(...)
+    // - This should be changed by the extending app by running
+    // setApplicationTitle(...)
     private String applicationTitle = "Unknown Application";
 
     // Should the application continue to run while in the background?
-    //  - If set to false, the app will freeze when it is no longer in the foreground
-    //  - This prevents the sync from progressing while the app is backgrounded.
+    // - If set to false, the app will freeze when it is no longer in the foreground
+    // - This prevents the sync from progressing while the app is backgrounded.
     private boolean runInBackground = false;
 
-    // Does this application recieve keystrokes while it is running in the background?
-    //  - Note: The application can only act on these keystrokes in realtime if it is also set
-    //     to run in background.
+    // Does this application recieve keystrokes while it is running in the
+    // background?
+    // - Note: The application can only act on these keystrokes in realtime if it is
+    // also set
+    // to run in background.
     private boolean applicationRecieveKeystrokesInBackground = false;
 
     public Application() {
@@ -135,11 +138,23 @@ public class Application {
         connection.pushEvent(new SetApplicationRunInBackgroundEvent(runInBackground));
     }
 
-
     public void setReceiveKeystrokesInBackground(boolean v) {
         applicationRecieveKeystrokesInBackground = v;
 
         // Send update to app server
-        connection.pushEvent(new SetApplicationReceiveKeystrokesInBackgroundEvent(applicationRecieveKeystrokesInBackground));
+        connection.pushEvent(
+                new SetApplicationReceiveKeystrokesInBackgroundEvent(applicationRecieveKeystrokesInBackground));
+    }
+
+    public String getTime() {
+        Calendar c = Calendar.getInstance();
+        String amPm = c.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM";
+        int hour = c.get(Calendar.HOUR);
+
+        if (hour == 0) {
+            hour = 12;
+        }
+
+        return String.format("%02d:%02d:%02d %s", hour, c.get(Calendar.MINUTE), c.get(Calendar.SECOND), amPm);
     }
 }

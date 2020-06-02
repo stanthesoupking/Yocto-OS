@@ -1,11 +1,16 @@
-package yocto.core.app.dashboard;
+package yocto.application.ui;
 
 import java.util.ArrayList;
 
 import yocto.application.Application;
+import yocto.event.ApplicationEvent;
+import yocto.event.ApplicationEventType;
+import yocto.event.KeyEvent;
+import yocto.event.KeyEventType;
 import yocto.util.Gravity;
 
 public class ButtonBar {
+    private Application app;
 
     float floatTime = 0;
     int xFloat = 0;
@@ -19,7 +24,8 @@ public class ButtonBar {
     public boolean floatingAnimation = true;
     public boolean showSelectedName = true;
 
-    public ButtonBar(int y) {
+    public ButtonBar(Application app, int y) {
+        this.app = app;
         this.y = y;
 
         items = new ArrayList<ButtonBarItem>();
@@ -56,7 +62,27 @@ public class ButtonBar {
         selectedIndex = (selectedIndex + 1) % items.size();
     }
 
-    public void draw(Application app) {
+    public ButtonBarItem getSelectedItem() {
+        return items.get(selectedIndex);
+    }
+
+    public void handleEvents() {
+        for (ApplicationEvent event : app.getEvents()) {
+            if (event.eventType == ApplicationEventType.KEY) {
+                KeyEvent keyEvent = (KeyEvent) event;
+                KeyEventType keyEventType = keyEvent.getKeyType();
+                if (keyEventType == KeyEventType.ArrowRight) {
+                    moveSelectionRight();
+                } else if (keyEventType == KeyEventType.ArrowLeft) {
+                    moveSelectionLeft();
+                } else if (keyEventType == KeyEventType.Enter) {
+                    getSelectedItem().onSelect();
+                }
+            }
+        }
+    }
+
+    public void draw() {
 
         int finalWidth = itemWidth + 6;
 
@@ -75,7 +101,8 @@ public class ButtonBar {
 
         if (showSelectedName) {
             // Draw selected name
-            app.writeString((Application.SCREEN_WIDTH / 2), y - (itemHeight / 2) - 4, items.get(selectedIndex).getName(), Gravity.BOTTOM_CENTER);
+            app.writeString((Application.SCREEN_WIDTH / 2), y - (itemHeight / 2) - 4,
+                    items.get(selectedIndex).getName(), Gravity.BOTTOM_CENTER);
         }
     }
 }

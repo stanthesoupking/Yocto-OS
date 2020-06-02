@@ -1,10 +1,11 @@
-package yocto.core.app.dashboard;
+package yocto.application.ui;
 
 import yocto.util.Bitmap;
 
 public class ButtonBarItem {
     private String name;
     private Bitmap icon;
+    private Action selectAction = new Action();
 
     public ButtonBarItem(String name, Bitmap icon) {
         this.name = name;
@@ -17,5 +18,13 @@ public class ButtonBarItem {
 
     public String getName() {
         return name;
+    }
+
+    public void onSelect() {
+        selectAction.doAction();
+    }
+
+    public void setOnSelect(Action action) {
+        selectAction = action;
     }
 }

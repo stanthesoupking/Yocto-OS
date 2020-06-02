@@ -1,21 +1,18 @@
 package yocto.core.app.dashboard;
 
 import java.io.IOException;
-import java.util.Calendar;
 
 import yocto.application.Application;
+import yocto.application.ui.ViewManager;
 import yocto.event.ApplicationEvent;
 import yocto.event.ApplicationEventType;
 import yocto.event.KeyEvent;
 import yocto.event.KeyEventType;
 import yocto.system.ApplicationServer;
-import yocto.system.YoctoSystem;
-import yocto.util.Bitmap;
-import yocto.util.Gravity;
 
 public class DashboardApplication extends Application {
     private ApplicationServer applicationServer;
-    ButtonBar bar;
+    private ViewManager viewManager;
 
     public DashboardApplication(ApplicationServer applicationServer) {
         super();
@@ -27,33 +24,24 @@ public class DashboardApplication extends Application {
         setApplicationTitle("Dashboard");
         setRunInBackground(true);
         setReceiveKeystrokesInBackground(true);
+        
+        viewManager = new ViewManager();
+        viewManager.pushView(new MainView(this, "Main"));
+        viewManager.pushView(new RunningAppsView(this, applicationServer, "Running Apps"));
 
-        bar = new ButtonBar(32);
-        try {
-            ButtonBarItem launcherButton = new ButtonBarItem("Launch App", Bitmap.loadFromFile("resources/img/launcher.bmp"));
-            bar.pushItem(launcherButton);
-
-            ButtonBarItem runningAppButton = new ButtonBarItem("Running Apps", Bitmap.loadFromFile("resources/img/running_app.bmp"));
-            bar.pushItem(runningAppButton);
-
-            ButtonBarItem settingsButton = new ButtonBarItem("Settings", Bitmap.loadFromFile("resources/img/settings.bmp"));
-            bar.pushItem(settingsButton);
-        } catch (IOException e) {
-            System.out.println("Error: Failed loading bitmap.");
-            System.exit(1);
-        }
+        viewManager.setCurrentView("Main");
 
         while (true) {
+            // Handle global events
             handleEvents();
 
-            writeString(1, 1, "Dashboard");
-            writeString(83, 1, getTime());
-            writeString(1, 64, "Yocto OS v" + YoctoSystem.YOCTO_VERSION, Gravity.BOTTOM_LEFT);
+            // Update current view
+            viewManager.handleEvents();
 
-            //writeString(1, 9, "Total running apps: " + applicationServer.getApplicationCount());
+            // Draw the current view
+            viewManager.draw();
 
-            bar.draw(this);
-
+            // Sync with the server
             try {
                 sync();
             } catch (IOException e) {
@@ -68,26 +56,12 @@ public class DashboardApplication extends Application {
             if (event.eventType == ApplicationEventType.KEY) {
                 KeyEvent keyEvent = (KeyEvent) event;
                 KeyEventType keyEventType = keyEvent.getKeyType();
-                if (keyEventType == KeyEventType.ArrowRight) {
-                    bar.moveSelectionRight();
-                } else if (keyEventType == KeyEventType.ArrowLeft) {
-                    bar.moveSelectionLeft();
+                if (keyEventType == KeyEventType.Escape) {
+                    // Switch focus back to the dashboard
+                    applicationServer.setForegroundApplication(0);
                 }
             }
         }
-    }
-
-    public String getTime() {
-        Calendar c = Calendar.getInstance();
-        String amPm = c.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM";
-        int hour = c.get(Calendar.HOUR);
-
-        if (hour == 0) {
-            hour = 12;
-        }
-
-        return String.format("%02d:%02d:%02d %s", hour, c.get(Calendar.MINUTE), c.get(Calendar.SECOND),
-                amPm);
     }
 
     public static void main(String args[]) {
