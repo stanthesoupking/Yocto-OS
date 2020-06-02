@@ -164,6 +164,7 @@ public class ApplicationContext {
                 || (event.eventType == ApplicationEventType.SET_PIXEL)
                 || (event.eventType == ApplicationEventType.UNSET_PIXEL)
                 || (event.eventType == ApplicationEventType.WRITE_CHAR)
-                || (event.eventType == ApplicationEventType.WRITE_STRING));
+                || (event.eventType == ApplicationEventType.WRITE_STRING)
+                || (event.eventType == ApplicationEventType.DRAW_BITMAP));
     }
 }

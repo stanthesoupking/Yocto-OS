@@ -41,9 +41,10 @@ public class ApplicationServer extends Thread {
                 app.start();
                 connectedApplications.add(app);
 
-                if (foregroundApplication == null) {
+                // Focus on any new apps
+                //if (foregroundApplication == null) {
                     setForegroundApplication(app);
-                }
+                //}
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -27,6 +27,7 @@ public class DashboardApplication extends Application {
         
         viewManager = new ViewManager();
         viewManager.pushView(new MainView(this, "Main"));
+        viewManager.pushView(new LaunchAppView(this, "Launch App"));
         viewManager.pushView(new RunningAppsView(this, applicationServer, "Running Apps"));
 
         viewManager.setCurrentView("Main");

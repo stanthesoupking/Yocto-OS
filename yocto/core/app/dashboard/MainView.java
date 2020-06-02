@@ -27,11 +27,11 @@ public class MainView extends View {
 
         bar = new ButtonBar(app, 32);
         try {
-            launcherButton = new ButtonBarItem("Launch App", Bitmap.loadFromFile("resources/img/launcher.bmp"));
+            launcherButton = new ButtonBarItem("Launch an App", Bitmap.loadFromFile("resources/img/launcher.bmp"));
             launcherButton.setOnSelect(new Action() {
                 @Override
                 public void doAction() {
-
+                    viewManager.setCurrentView("Launch App");
                 }
             });
             bar.pushItem(launcherButton);
