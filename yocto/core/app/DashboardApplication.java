@@ -31,6 +31,7 @@ public class DashboardApplication extends Application {
             System.exit(1);
         }
 
+        int x = -logoBmp.getWidth();
         while (true) {
             writeString(1, 1, "Dashboard");
             writeString(83, 1, getTime());
@@ -39,7 +40,11 @@ public class DashboardApplication extends Application {
             writeString(1, 9, "Total running apps: " + applicationServer.getApplicationCount());
 
             // Draw bitmap
-            drawBitmap(16, 18, logoBmp);
+            drawBitmap(x++, 18, logoBmp);
+
+            if (x > 128) {
+                x = -logoBmp.getWidth();
+            }
 
             try {
                 sync();

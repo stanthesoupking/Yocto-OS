@@ -30,7 +30,7 @@ public class Bitmap implements Serializable {
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
                 int p = bImg.getRGB(x, y) * -1;
-                bitmap.setPixel(x, y, p == 1);
+                bitmap.setPixel(x, y, p != 1);
             }
         }
 
