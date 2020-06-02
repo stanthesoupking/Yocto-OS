@@ -13,6 +13,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import yocto.logging.Logger;
+import yocto.util.Bitmap;
 
 public class ApplicationLauncher {
     private static final String APPLICATION_INSTALL_PATH = "yocto/applications";
@@ -68,7 +69,7 @@ public class ApplicationLauncher {
         } catch (IOException e) {
             Logger.log(getClass(), "IO Error: " + e.getMessage());
         }
-        
+
     }
 
     private InstalledApplication getApplicationEntry(File basePath) {
@@ -87,8 +88,16 @@ public class ApplicationLauncher {
             String path = basePath.getPath();
             String name = (String) object.get("name");
             String launchCommand = (String) object.get("launchCommand");
+            String iconPath = (String) object.get("icon");
 
-            InstalledApplication app = new InstalledApplication(path, name, launchCommand);
+            Bitmap icon;
+            if (iconPath != null) {
+                icon = Bitmap.loadFromFile(path + File.separatorChar + iconPath);
+            } else {
+                icon = Bitmap.loadFromFile("resources/img/unknown_app.bmp");
+            }
+
+            InstalledApplication app = new InstalledApplication(path, name, launchCommand, icon);
             return app;
         } catch (IOException e) {
             Logger.log(getClass(), "IO Error: " + e.getMessage());

@@ -55,6 +55,8 @@ public class LaunchAppView extends View {
     }
 
     private void createButtonBar() {
+        applicationLauncher.scanForApplications();
+        
         bar = new ButtonBar(app, 32);
         try {
             backButton = new ButtonBarItem("Back", Bitmap.loadFromFile("resources/img/back.bmp"));
@@ -66,10 +68,8 @@ public class LaunchAppView extends View {
             });
             bar.pushItem(backButton);
 
-            Bitmap unknownAppBmp = Bitmap.loadFromFile("resources/img/unknown_app.bmp");
-
             for (InstalledApplication installedApplication : applicationLauncher.getInstalledApplications()) {
-                ButtonBarItem appItem = new ButtonBarItem(installedApplication.getTitle(), unknownAppBmp);
+                ButtonBarItem appItem = new ButtonBarItem(installedApplication.getTitle(), installedApplication.getIcon());
                 appItem.setOnSelect(new Action() {
                     @Override
                     public void doAction() {
