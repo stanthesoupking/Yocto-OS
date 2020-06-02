@@ -27,7 +27,7 @@ public class DashboardApplication extends Application {
         setRunInBackground(true);
         setReceiveKeystrokesInBackground(true);
 
-        bar = new ButtonBar(32);
+        bar = new ButtonBar(32, true);
         try {
             ButtonBarItem launcherButton = new ButtonBarItem(Bitmap.loadFromFile("resources/img/launcher.bmp"));
             bar.pushItem(launcherButton);
@@ -79,7 +79,13 @@ public class DashboardApplication extends Application {
     public String getTime() {
         Calendar c = Calendar.getInstance();
         String amPm = c.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM";
-        return String.format("%02d:%02d:%02d %s", c.get(Calendar.HOUR), c.get(Calendar.MINUTE), c.get(Calendar.SECOND),
+        int hour = c.get(Calendar.HOUR);
+
+        if (hour == 0) {
+            hour = 12;
+        }
+
+        return String.format("%02d:%02d:%02d %s", hour, c.get(Calendar.MINUTE), c.get(Calendar.SECOND),
                 amPm);
     }
 

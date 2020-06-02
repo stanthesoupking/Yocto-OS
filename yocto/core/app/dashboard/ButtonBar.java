@@ -6,6 +6,8 @@ import yocto.application.Application;
 
 public class ButtonBar {
 
+    float floatTime = 0;
+    int xFloat = 0;
     int selectedIndex = 0;
     ArrayList<ButtonBarItem> items;
 
@@ -13,8 +15,18 @@ public class ButtonBar {
     int itemWidth = 1;
     int itemHeight = 1;
 
+    boolean floatingAnimation;
+
     public ButtonBar(int y) {
         this.y = y;
+        this.floatingAnimation = false;
+
+        items = new ArrayList<ButtonBarItem>();
+    }
+
+    public ButtonBar(int y, boolean floatingAnimation) {
+        this.y = y;
+        this.floatingAnimation = floatingAnimation;
 
         items = new ArrayList<ButtonBarItem>();
     }
@@ -55,9 +67,14 @@ public class ButtonBar {
         int finalWidth = itemWidth + 6;
 
         int i = 0;
+        floatTime += 0.5;
         for (ButtonBarItem item : items) {
-            int x = (Application.SCREEN_WIDTH/2) + ((i - selectedIndex) * finalWidth) - (finalWidth / 2);
-            app.drawBitmap(x, y - (itemHeight / 2), item.getIcon());
+            int x = (Application.SCREEN_WIDTH / 2) + ((i - selectedIndex) * finalWidth) - (finalWidth / 2);
+            int bY = y - (itemHeight / 2);
+            if (floatingAnimation && (i == selectedIndex)) {
+                bY -= (int) (Math.pow(1 + Math.sin(floatTime), 2) * 0.75);
+            }
+            app.drawBitmap(x, bY, item.getIcon());
             i++;
         }
     }
