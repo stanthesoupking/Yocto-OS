@@ -14,6 +14,9 @@ import yocto.event.SetApplicationTitleEvent;
 import yocto.event.WriteStringEvent;
 
 public class Application {
+    public final static int SCREEN_WIDTH = 128;
+    public final static int SCREEN_HEIGHT = 64;
+
     // Connection to the Yocto application server
     private ApplicationServerConnection connection;
 

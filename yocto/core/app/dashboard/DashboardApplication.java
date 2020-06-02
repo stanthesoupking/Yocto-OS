@@ -1,16 +1,20 @@
-package yocto.core.app;
+package yocto.core.app.dashboard;
 
 import java.io.IOException;
 import java.util.Calendar;
 
 import yocto.application.Application;
+import yocto.event.ApplicationEvent;
+import yocto.event.ApplicationEventType;
+import yocto.event.KeyEvent;
+import yocto.event.KeyEventType;
 import yocto.system.ApplicationServer;
-import yocto.system.ConnectedApplication;
 import yocto.system.YoctoSystem;
 import yocto.util.Bitmap;
 
 public class DashboardApplication extends Application {
     private ApplicationServer applicationServer;
+    ButtonBar bar;
 
     public DashboardApplication(ApplicationServer applicationServer) {
         super();
@@ -23,34 +27,51 @@ public class DashboardApplication extends Application {
         setRunInBackground(true);
         setReceiveKeystrokesInBackground(true);
 
-        Bitmap logoBmp = null;
+        bar = new ButtonBar(32);
         try {
-            logoBmp = Bitmap.loadFromFile("resources/img/logo.bmp");
+            ButtonBarItem launcherButton = new ButtonBarItem(Bitmap.loadFromFile("resources/img/launcher.bmp"));
+            bar.pushItem(launcherButton);
+
+            ButtonBarItem runningAppButton = new ButtonBarItem(Bitmap.loadFromFile("resources/img/running_app.bmp"));
+            bar.pushItem(runningAppButton);
+
+            ButtonBarItem settingsButton = new ButtonBarItem(Bitmap.loadFromFile("resources/img/settings.bmp"));
+            bar.pushItem(settingsButton);
         } catch (IOException e) {
             System.out.println("Error: Failed loading bitmap.");
             System.exit(1);
         }
 
-        int x = -logoBmp.getWidth();
         while (true) {
+            handleEvents();
+
             writeString(1, 1, "Dashboard");
             writeString(83, 1, getTime());
             writeString(1, 58, "Yocto OS v" + YoctoSystem.YOCTO_VERSION);
 
-            writeString(1, 9, "Total running apps: " + applicationServer.getApplicationCount());
+            //writeString(1, 9, "Total running apps: " + applicationServer.getApplicationCount());
 
-            // Draw bitmap
-            drawBitmap(x++, 18, logoBmp);
-
-            if (x > 128) {
-                x = -logoBmp.getWidth();
-            }
+            bar.draw(this);
 
             try {
                 sync();
             } catch (IOException e) {
                 System.out.println("Sync failed.");
                 System.exit(1);
+            }
+        }
+    }
+
+    public void handleEvents() {
+        for (ApplicationEvent event : getEvents()) {
+            if (event.eventType == ApplicationEventType.KEY) {
+                KeyEvent keyEvent = (KeyEvent) event;
+                KeyEventType keyEventType = keyEvent.getKeyType();
+                if (keyEventType == KeyEventType.ArrowRight) {
+                    bar.moveSelectionRight();
+                } else if (keyEventType == KeyEventType.ArrowLeft) {
+                    bar.moveSelectionLeft();
+                }
             }
         }
     }

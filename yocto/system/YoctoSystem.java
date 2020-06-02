@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import yocto.application.ThreadedApplicationRunner;
-import yocto.core.app.DashboardApplication;
+import yocto.core.app.dashboard.DashboardApplication;
 import yocto.driver.Display;
 import yocto.logging.Logger;
 import yocto.util.bdf.Font;
