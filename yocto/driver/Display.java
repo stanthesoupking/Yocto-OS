@@ -7,6 +7,7 @@ import com.pi4j.io.spi.SpiMode;
 
 import yocto.logging.Logger;
 import yocto.util.Bitmap;
+import yocto.util.Gravity;
 import yocto.util.IntegerPair;
 import yocto.util.bdf.Font;
 
@@ -263,13 +264,60 @@ public class Display {
     }
 
     public void writeString(int x, int y, Font font, String text) throws IOException {
-        int charWidth = font.getFontWidth();
+        writeString(x, y, font, text, Gravity.TOP_LEFT);
+    }
+
+    public void writeString(int x, int y, Font font, String text, Gravity gravity) throws IOException {
+        int charWidth = font.getFontWidth() + 1;
+        int charHeight = font.getFontHeight();
+
+        int offsetX = 0;
+        int offsetY = 0;
+
+        switch (gravity) {
+            case TOP_LEFT:
+                offsetX = 0;
+                offsetY = 0;
+                break;
+            case TOP_CENTER:
+                offsetX = -(charWidth * text.length()) / 2;
+                offsetY = 0;
+                break;
+            case TOP_RIGHT:
+                offsetX = charWidth * text.length();
+                offsetY = 0;
+                break;
+            case LEFT:
+                offsetX = 0;
+                offsetY = -(charHeight / 2);
+                break;
+            case CENTER:
+                offsetX = -(charWidth * text.length()) / 2;
+                offsetY = -(charHeight / 2);
+                break;
+            case RIGHT:
+                offsetX = charWidth * text.length();
+                offsetY = -(charHeight / 2);
+                break;
+            case BOTTOM_LEFT:
+                offsetX = 0;
+                offsetY = -charHeight;
+                break;
+            case BOTTOM_CENTER:
+                offsetX = -(charWidth * text.length()) / 2;
+                offsetY = -charHeight;
+                break;
+            case BOTTOM_RIGHT:
+                offsetX = charWidth * text.length();
+                offsetY = -charHeight;
+                break;
+        }
 
         int cx = x;
         int totalChars = text.length();
         for (int i = 0; i < totalChars; i++) {
-            writeChar(cx, y, font, text.charAt(i));
-            cx += charWidth + 1;
+            writeChar(cx + offsetX, y + offsetY, font, text.charAt(i));
+            cx += charWidth;
         }
     }
 

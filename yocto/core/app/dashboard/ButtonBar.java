@@ -3,6 +3,7 @@ package yocto.core.app.dashboard;
 import java.util.ArrayList;
 
 import yocto.application.Application;
+import yocto.util.Gravity;
 
 public class ButtonBar {
 
@@ -15,18 +16,11 @@ public class ButtonBar {
     int itemWidth = 1;
     int itemHeight = 1;
 
-    boolean floatingAnimation;
+    public boolean floatingAnimation = true;
+    public boolean showSelectedName = true;
 
     public ButtonBar(int y) {
         this.y = y;
-        this.floatingAnimation = false;
-
-        items = new ArrayList<ButtonBarItem>();
-    }
-
-    public ButtonBar(int y, boolean floatingAnimation) {
-        this.y = y;
-        this.floatingAnimation = floatingAnimation;
 
         items = new ArrayList<ButtonBarItem>();
     }
@@ -74,8 +68,14 @@ public class ButtonBar {
             if (floatingAnimation && (i == selectedIndex)) {
                 bY -= (int) (Math.pow(1 + Math.sin(floatTime), 2) * 0.75);
             }
+
             app.drawBitmap(x, bY, item.getIcon());
             i++;
+        }
+
+        if (showSelectedName) {
+            // Draw selected name
+            app.writeString((Application.SCREEN_WIDTH / 2), y - (itemHeight / 2) - 4, items.get(selectedIndex).getName(), Gravity.BOTTOM_CENTER);
         }
     }
 }

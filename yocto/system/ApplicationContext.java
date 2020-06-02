@@ -126,7 +126,7 @@ public class ApplicationContext {
         try {
             WriteStringEvent writeStringEvent = (WriteStringEvent) event;
             synchronized (display) {
-                display.writeString(writeStringEvent.x, writeStringEvent.y, font, writeStringEvent.text);
+                display.writeString(writeStringEvent.x, writeStringEvent.y, font, writeStringEvent.text, writeStringEvent.gravity);
             }
         } catch (IOException e) {
             e.printStackTrace();

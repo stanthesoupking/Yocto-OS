@@ -5,6 +5,7 @@ import java.lang.reflect.Constructor;
 
 import yocto.logging.Logger;
 import yocto.util.Bitmap;
+import yocto.util.Gravity;
 import yocto.event.ApplicationEvent;
 import yocto.event.ApplicationEventType;
 import yocto.event.DrawBitmapEvent;
@@ -103,7 +104,11 @@ public class Application {
     }
 
     public void writeString(int x, int y, String text) {
-        WriteStringEvent event = new WriteStringEvent(x, y, text);
+        writeString(x, y, text, Gravity.TOP_LEFT);
+    }
+
+    public void writeString(int x, int y, String text, Gravity gravity) {
+        WriteStringEvent event = new WriteStringEvent(x, y, text, gravity);
         connection.pushEvent(event);
     }
 

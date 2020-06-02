@@ -11,6 +11,7 @@ import yocto.event.KeyEventType;
 import yocto.system.ApplicationServer;
 import yocto.system.YoctoSystem;
 import yocto.util.Bitmap;
+import yocto.util.Gravity;
 
 public class DashboardApplication extends Application {
     private ApplicationServer applicationServer;
@@ -27,15 +28,15 @@ public class DashboardApplication extends Application {
         setRunInBackground(true);
         setReceiveKeystrokesInBackground(true);
 
-        bar = new ButtonBar(32, true);
+        bar = new ButtonBar(32);
         try {
-            ButtonBarItem launcherButton = new ButtonBarItem(Bitmap.loadFromFile("resources/img/launcher.bmp"));
+            ButtonBarItem launcherButton = new ButtonBarItem("Launch App", Bitmap.loadFromFile("resources/img/launcher.bmp"));
             bar.pushItem(launcherButton);
 
-            ButtonBarItem runningAppButton = new ButtonBarItem(Bitmap.loadFromFile("resources/img/running_app.bmp"));
+            ButtonBarItem runningAppButton = new ButtonBarItem("Running Apps", Bitmap.loadFromFile("resources/img/running_app.bmp"));
             bar.pushItem(runningAppButton);
 
-            ButtonBarItem settingsButton = new ButtonBarItem(Bitmap.loadFromFile("resources/img/settings.bmp"));
+            ButtonBarItem settingsButton = new ButtonBarItem("Settings", Bitmap.loadFromFile("resources/img/settings.bmp"));
             bar.pushItem(settingsButton);
         } catch (IOException e) {
             System.out.println("Error: Failed loading bitmap.");
@@ -47,7 +48,7 @@ public class DashboardApplication extends Application {
 
             writeString(1, 1, "Dashboard");
             writeString(83, 1, getTime());
-            writeString(1, 58, "Yocto OS v" + YoctoSystem.YOCTO_VERSION);
+            writeString(1, 64, "Yocto OS v" + YoctoSystem.YOCTO_VERSION, Gravity.BOTTOM_LEFT);
 
             //writeString(1, 9, "Total running apps: " + applicationServer.getApplicationCount());
 
